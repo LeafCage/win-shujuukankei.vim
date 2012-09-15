@@ -1,44 +1,6 @@
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 
-function! Shujuu#Dokuritsu(gekokujo) "{{{
-  if winnr('$') == 1
-    let w:shujuu = g:shujuu_top
-    return
-  endif
-  let save_winnr = winnr()
-  exe v:count. 'wincmd w'
-
-  if v:count || w:shujuu > g:shujuu_top
-    if a:gekokujo
-      call s:__gekokujo(g:shujuu_top, g:shujuu_top+1)
-    endif
-    let w:shujuu = g:shujuu_top
-    redraw!
-  else
-    if a:gekokujo
-      call s:__gekokujo(g:shujuu_top+1, g:shujuu_top)
-    endif
-    let w:shujuu = g:shujuu_top+1
-    redraw!
-  endif
-
-  exe save_winnr. 'wincmd w'
-endfunction
-"}}}
-
-function! s:__gekokujo(from, to) "{{{
-  for picked in range(1, winnr('$'))
-    if getwinvar(picked, 'shujuu') == a:from
-      call setwinvar(picked, 'shujuu', a:to)
-      break
-    endif
-  endfor
-endfunction
-"}}}
-
-"-----------------------------------------------------------------------------
-
 function! Shujuu#Raise_all(vart) "{{{
   for winnr in range(1, winnr('$'))
     let shujuu = getwinvar(winnr, 'shujuu')

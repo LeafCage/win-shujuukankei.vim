@@ -1,9 +1,6 @@
 let s:save_cpo = &cpo| set cpo&vim
 "=============================================================================
 
-noremap <silent><Plug>(win-shujuukankei-Dokuritsu) :<C-u>call Shujuu#Dokuritsu(0)<CR>
-noremap <silent><Plug>(win-shujuukankei-Gekokujo) :<C-u>call Shujuu#Dokuritsu(1)<CR>
-
 noremap <silent><Plug>(win-shujuukankei-Raise_all) :<C-u>call Shujuu#Raise_all(1)<CR>
 noremap <silent><Plug>(win-shujuukankei-Raise) :<C-u>call Shujuu#Raise(1)<CR>
 noremap <silent><Plug>(win-shujuukankei-Lower) :<C-u>call Shujuu#Raise(-1)<CR>
