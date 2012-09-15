@@ -1,0 +1,117 @@
+*win-shujuukankei.jax*	窓に主従関係を示す変数を付加する
+
+==============================================================================
+概要						*win-shujuukankei-introduction*
+
+各ウィンドウにウィンドウローカル変数 w:shujuu を付加する。
+この変数の値が小さいウィンドウほど位が上である。
+w:shujuu == 1 のウィンドウから作られたウィンドウの w:shujuu の値は 2 になる。
+w:shujuu == 2 のウィンドウから作られたウィンドウの w:shujuu の値は 3 になる。
+このようにウィンドウが作られる時に与えられる値は 1 大きくなる。
+これによって、どのウィンドウがどのウィンドウの子であるかをはっきりさせる。
+
+ウィンドウ分割を使わない人とってこのプラグインはほとんど意味がない。
+管理するのはタブページ内のウィンドウであって、タブページの主従関係は規定できな
+い。
+
+最高位の窓が閉じられるなどで現在タブページ内に最高位の窓が存在しなくなった時、
+次に位が高い窓が最高位の窓に昇格するようにそれぞれの窓の w:shujuu の値が調整さ
+れる。
+ただし、Vimに窓を閉じたことを捕捉する|autocmd-events|なく、窓を閉じたことを正
+しく捉えることが難しいため、この機能が発動するまでに若干のラグがある。
+
+==============================================================================
+変数						*win-shujuukankei-variables*
+
+*g:shujuu_top*
+	初期値 0
+	一番上の地位の窓に与えられる値であり、一番最初の窓に与えられる値。
+	通常は w:shujuu はこの値よりも小さくはならない。
+
+
+
+*g:shujuu_bottom*
+	初期値 2
+	地位が最も低い窓に与えられる値。
+	普通は w:shujuu はこの値よりも大きな値にはならない筈である。
+
+
+==============================================================================
+キーマッピング					*win-shujuukankei-keymappings*
+
+*<Plug>(win-shujuukankei-Raise_all)*
+	全ての窓（w:shujuuが|g:shujuu_top|の値より小さい窓は除く）
+	の w:shujuu の値を 1 減らす。
+	ただし|g:shujuu_top|より小さくなることはない。
+
+
+
+*<Plug>(win-shujuukankei-Raise)*
+	現在窓の w:shujuu の値を 1 減らす。
+	ただし|g:shujuu_top|より小さくなることはない。
+
+
+
+*<Plug>(win-shujuukankei-Lower)*
+	現在窓の w:shujuu の値を 1 増やす。
+	ただし|g:shujuu_bottom|より大きくなることはない。
+
+
+
+*<Plug>(win-shujuukankei-Exchange)*
+	相手の窓番号の入力を求められる。
+	そして現在窓と相手窓の w:shujuu を入れ替える。
+	'0' や 無効な値を入力した時には何も起こらない。
+
+
+
+*<Plug>(win-shujuukankei-Dokuritsu)*
+	カウントが与えられなければ現在窓を、
+	与えられれば与えられたカウント番号の窓を、
+	w:shujuu を|g:shujuu_top|で指定した値にする。
+	すなわち、最高位の窓にする。
+	すでに最高位の窓の場合、w:shujuu を|g:shujuu_top|+1にする。
+	すなわち、最高位から退く。
+	タブ内に窓が一つしかない場合は現在窓を最高位の窓にする。
+
+
+
+*<Plug>(win-shujuukankei-Gekokujo)*
+	|<Plug>(win-shujuukankei-Dokuritsu)>|とほぼ同じ。
+	ただし、対象窓が最高位に上がる時、現在最高位の窓は最高位から退く。
+	対象窓が最高位から退く時、w:shujuu == g:shujuu_top + 1の窓の一つが
+	最高位になる。
+
+
+
+==============================================================================
+使用例						*win-shujuukankei-example*
+
+win-shujuukankeiは変数をセットするだけで、それを表示する手段を持っていないので、
+:echo するなり、ステータスラインに表示するなりする設定はユーザが行わなければ
+ならない。
+
+以下に例を示す。
+>
+ let g:shujuu_top = 1
+ let g:shujuu_bottom = 4
+
+
+ "ステータスラインの末尾にその窓の地位を漢字一字で表示する
+ let &stl .='%{get(["天", "主", "副", "平", "僕"],
+		 \ exists("b:shujuu_overtaker")?0:w:shujuu, "謎")}'
+
+
+ "ただしb:shujuu_overtakerが設定された特殊なバッファについては"天"を表示する
+ au FileType vimfiler,unite,vimshell    let b:shujuu_overtaker = 1
+
+
+ "キーマッピング
+ nmap <Leader>jR    <Plug>(win-shujuukankei-Raise_all)
+ nmap <Leader>jr    <Plug>(win-shujuukankei-Raise)
+ nmap <Leader>jl    <Plug>(win-shujuukankei-Lower)
+ nmap <Leader>jx    <Plug>(win-shujuukankei-Exchange)
+ nnoremap <Leader>je    :echo 'shujuu: '. w:shujuu<CR>
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:nolist:
